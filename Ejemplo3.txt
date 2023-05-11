@@ -1,4 +1,0 @@
-let digito = '0|1|2'
-let numero = 'digito(digito)*'
-let letra = 'a|b|c'
-let identificador = 'letra(letra|digito)*'
