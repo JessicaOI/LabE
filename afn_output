@@ -1,0 +1,16 @@
+digraph AFN {
+	rankdir=LR
+	node [shape=circle]
+	A
+	B
+	C
+	D
+	node [shape=doublecircle]
+	E
+	A -> B [label=0]
+	A -> C [label=1]
+	A -> D [label=2]
+	B -> E [label="ε"]
+	C -> E [label="ε"]
+	D -> E [label="ε"]
+}

@@ -1,0 +1,15 @@
+let entero = 0|1|2|3|4|5|6|7|8|9
+let decimal = entero.entero
+let hexadecimal = 0[xX][0-9a-fA-F]+
+let operador = \+|\-|\*
+let potenciacion = \^
+let tabulaciones = \t|\n 
+
+
+rule tokens =
+entero                        { printf("Entero: %s\n", yytext); }
+| decimal                     { printf("Decimal: %s\n", yytext); }
+| hexadecimal                 { printf("Hexadecimal: %s\n", yytext); }
+| operador                    { printf("Operador aritmético: %s\n", yytext); }
+| potenciacion                { printf("Operador de potenciación: %s\n", yytext); }
+| tabulaciones                { /* ignorar */ }

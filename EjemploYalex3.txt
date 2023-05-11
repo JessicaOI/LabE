@@ -1,0 +1,16 @@
+let identificador = [_a-zA-Z][_a-zA-Z0-9]*xyz
+let entero = 0|1|2|3|4|5|6|7|8|9
+let decimal = entero.entero
+let cadena_caracteres = \"[^\"]*\"
+let palabra_reservada = \b(if|for|while)\b
+let tabulaciones = \t|\n 
+
+
+rule tokens =
+
+identificador                 { printf("Identificador: %s\n", yytext); }
+| entero                        { printf("Entero: %s\n", yytext); }
+| decimal                       { printf("Decimal: %s\n", yytext); }
+| palabra_reservada             { printf("Palabra reservada: %s\n", yytext); }
+| cadena_caracteres             { printf("Cadena de caracteres: %s\n", yytext); }
+| tabulaciones                       { /* ignorar */ }

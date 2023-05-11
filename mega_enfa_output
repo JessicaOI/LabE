@@ -1,0 +1,322 @@
+digraph Combined_ENFA {
+	node [fillcolor=lightblue shape=circle style=filled]
+	MegaStart
+	1
+	2
+	3
+	4
+	5
+	6
+	7
+	8
+	9
+	10
+	11
+	12
+	13
+	14
+	15
+	16
+	17
+	18
+	19
+	20
+	21
+	22
+	23
+	24
+	25
+	26
+	27
+	28
+	29
+	30
+	31
+	32
+	33
+	34
+	35
+	36
+	37
+	38
+	1 -> 3 [label=epsilon]
+	1 -> 5 [label=epsilon]
+	4 -> 2 [label=epsilon]
+	3 -> 4 [label=0]
+	6 -> 2 [label=epsilon]
+	5 -> 9 [label=epsilon]
+	5 -> 7 [label=epsilon]
+	8 -> 6 [label=epsilon]
+	7 -> 8 [label=1]
+	10 -> 6 [label=epsilon]
+	9 -> 11 [label=epsilon]
+	9 -> 13 [label=epsilon]
+	12 -> 10 [label=epsilon]
+	11 -> 12 [label=2]
+	14 -> 10 [label=epsilon]
+	13 -> 17 [label=epsilon]
+	13 -> 15 [label=epsilon]
+	16 -> 14 [label=epsilon]
+	15 -> 16 [label=3]
+	18 -> 14 [label=epsilon]
+	17 -> 19 [label=epsilon]
+	17 -> 21 [label=epsilon]
+	20 -> 18 [label=epsilon]
+	19 -> 20 [label=4]
+	22 -> 18 [label=epsilon]
+	21 -> 25 [label=epsilon]
+	21 -> 23 [label=epsilon]
+	24 -> 22 [label=epsilon]
+	23 -> 24 [label=5]
+	26 -> 22 [label=epsilon]
+	25 -> 27 [label=epsilon]
+	25 -> 29 [label=epsilon]
+	28 -> 26 [label=epsilon]
+	27 -> 28 [label=6]
+	30 -> 26 [label=epsilon]
+	29 -> 33 [label=epsilon]
+	29 -> 31 [label=epsilon]
+	32 -> 30 [label=epsilon]
+	31 -> 32 [label=7]
+	34 -> 30 [label=epsilon]
+	33 -> 35 [label=epsilon]
+	33 -> 37 [label=epsilon]
+	36 -> 34 [label=epsilon]
+	35 -> 36 [label=8]
+	38 -> 34 [label=epsilon]
+	37 -> 38 [label=9]
+	node [shape=doublecircle]
+	2 [label="2 (entero)"]
+	MegaStart -> 1 [label="ε"]
+	40
+	41
+	42
+	43
+	44
+	45
+	46
+	47
+	48
+	49
+	50
+	51
+	52
+	53
+	54
+	55
+	56
+	57
+	58
+	59
+	60
+	61
+	62
+	63
+	64
+	65
+	66
+	67
+	68
+	69
+	70
+	71
+	72
+	73
+	74
+	75
+	76
+	77
+	78
+	79
+	80
+	81
+	82
+	83
+	84
+	85
+	86
+	87
+	88
+	89
+	90
+	91
+	92
+	93
+	94
+	95
+	96
+	97
+	98
+	99
+	100
+	101
+	102
+	103
+	104
+	105
+	106
+	107
+	108
+	109
+	110
+	111
+	112
+	113
+	114
+	115
+	42 -> 43 [label=epsilon]
+	40 -> 44 [label=epsilon]
+	40 -> 46 [label=epsilon]
+	45 -> 42 [label=epsilon]
+	44 -> 45 [label=0]
+	47 -> 42 [label=epsilon]
+	46 -> 48 [label=epsilon]
+	46 -> 50 [label=epsilon]
+	49 -> 47 [label=epsilon]
+	48 -> 49 [label=1]
+	51 -> 47 [label=epsilon]
+	50 -> 52 [label=epsilon]
+	50 -> 54 [label=epsilon]
+	53 -> 51 [label=epsilon]
+	52 -> 53 [label=2]
+	55 -> 51 [label=epsilon]
+	54 -> 56 [label=epsilon]
+	54 -> 58 [label=epsilon]
+	57 -> 55 [label=epsilon]
+	56 -> 57 [label=3]
+	59 -> 55 [label=epsilon]
+	58 -> 60 [label=epsilon]
+	58 -> 62 [label=epsilon]
+	61 -> 59 [label=epsilon]
+	60 -> 61 [label=4]
+	63 -> 59 [label=epsilon]
+	62 -> 64 [label=epsilon]
+	62 -> 66 [label=epsilon]
+	65 -> 63 [label=epsilon]
+	64 -> 65 [label=5]
+	67 -> 63 [label=epsilon]
+	66 -> 68 [label=epsilon]
+	66 -> 70 [label=epsilon]
+	69 -> 67 [label=epsilon]
+	68 -> 69 [label=6]
+	71 -> 67 [label=epsilon]
+	70 -> 72 [label=epsilon]
+	70 -> 74 [label=epsilon]
+	73 -> 71 [label=epsilon]
+	72 -> 73 [label=7]
+	75 -> 71 [label=epsilon]
+	74 -> 76 [label=epsilon]
+	74 -> 78 [label=epsilon]
+	77 -> 75 [label=epsilon]
+	76 -> 77 [label=8]
+	79 -> 75 [label=epsilon]
+	78 -> 79 [label=9]
+	43 -> 80 [label=epsilon]
+	43 -> 82 [label=epsilon]
+	81 -> 41 [label=epsilon]
+	80 -> 81 [label=0]
+	83 -> 41 [label=epsilon]
+	82 -> 84 [label=epsilon]
+	82 -> 86 [label=epsilon]
+	85 -> 83 [label=epsilon]
+	84 -> 85 [label=1]
+	87 -> 83 [label=epsilon]
+	86 -> 88 [label=epsilon]
+	86 -> 90 [label=epsilon]
+	89 -> 87 [label=epsilon]
+	88 -> 89 [label=2]
+	91 -> 87 [label=epsilon]
+	90 -> 92 [label=epsilon]
+	90 -> 94 [label=epsilon]
+	93 -> 91 [label=epsilon]
+	92 -> 93 [label=3]
+	95 -> 91 [label=epsilon]
+	94 -> 96 [label=epsilon]
+	94 -> 98 [label=epsilon]
+	97 -> 95 [label=epsilon]
+	96 -> 97 [label=4]
+	99 -> 95 [label=epsilon]
+	98 -> 100 [label=epsilon]
+	98 -> 102 [label=epsilon]
+	101 -> 99 [label=epsilon]
+	100 -> 101 [label=5]
+	103 -> 99 [label=epsilon]
+	102 -> 104 [label=epsilon]
+	102 -> 106 [label=epsilon]
+	105 -> 103 [label=epsilon]
+	104 -> 105 [label=6]
+	107 -> 103 [label=epsilon]
+	106 -> 108 [label=epsilon]
+	106 -> 110 [label=epsilon]
+	109 -> 107 [label=epsilon]
+	108 -> 109 [label=7]
+	111 -> 107 [label=epsilon]
+	110 -> 112 [label=epsilon]
+	110 -> 114 [label=epsilon]
+	113 -> 111 [label=epsilon]
+	112 -> 113 [label=8]
+	115 -> 111 [label=epsilon]
+	114 -> 115 [label=9]
+	node [shape=doublecircle]
+	41 [label="41 (decimal)"]
+	MegaStart -> 40 [label="ε"]
+	117
+	118
+	119
+	120
+	121
+	122
+	117 -> 119 [label=epsilon]
+	117 -> 121 [label=epsilon]
+	120 -> 118 [label=epsilon]
+	119 -> 120 [label="0[xX][0-9a-fA-F]"]
+	122 -> 118 [label=epsilon]
+	node [shape=doublecircle]
+	118 [label="118 (hexadecimal)"]
+	MegaStart -> 117 [label="ε"]
+	124
+	125
+	126
+	127
+	128
+	129
+	130
+	131
+	132
+	133
+	124 -> 126 [label=epsilon]
+	124 -> 128 [label=epsilon]
+	127 -> 125 [label=epsilon]
+	126 -> 127 [label="+"]
+	129 -> 125 [label=epsilon]
+	128 -> 132 [label=epsilon]
+	128 -> 130 [label=epsilon]
+	131 -> 129 [label=epsilon]
+	130 -> 131 [label="-"]
+	133 -> 129 [label=epsilon]
+	132 -> 133 [label="*"]
+	node [shape=doublecircle]
+	125 [label="125 (operador)"]
+	MegaStart -> 124 [label="ε"]
+	135
+	136
+	135 -> 136 [label="^"]
+	node [shape=doublecircle]
+	136 [label="136 (potenciacion)"]
+	MegaStart -> 135 [label="ε"]
+	138
+	139
+	140
+	141
+	142
+	143
+	138 -> 140 [label=epsilon]
+	138 -> 142 [label=epsilon]
+	141 -> 139 [label=epsilon]
+	140 -> 141 [label=t]
+	143 -> 139 [label=epsilon]
+	142 -> 143 [label=n]
+	node [shape=doublecircle]
+	139 [label="139 (tabulaciones)"]
+	MegaStart -> 138 [label="ε"]
+}

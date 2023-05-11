@@ -1,0 +1,10 @@
+digraph ENFA {
+	node [shape=circle]
+	0
+	1
+	node [fillcolor=lightblue shape=circle style=filled]
+	"{0}"
+	node [shape=doublecircle]
+	1 [label="1 (potenciacion)"]
+	0 -> 1 [label="^"]
+}

@@ -1,0 +1,13 @@
+let identificador = [_a-zA-Z][_a-zA-Z0-9]*
+let entero = 0|1|2|3|4|5|6|7|8|9
+let operador = \+|\-|\*
+let palabra_reservada = \b(if|for|while)\b
+let tabulaciones = \t|\n 
+
+
+rule tokens =
+identificador                   { printf("Identificador: %s\n", yytext); }
+| entero                        { printf("Entero: %s\n", yytext); }
+| operador                      { printf("Operador aritmético: %s\n", yytext); }
+| palabra_reservada             { printf("Palabra reservada: %s\n", yytext); }
+| tabulaciones                  { /* ignorar */ }
