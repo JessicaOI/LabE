@@ -1,0 +1,22 @@
+/* Definición de parser */
+/* INICIA sección de TOKENS */
+%token TOKEN_1
+%token TOKEN_2
+%token TOKEN_3 TOKEN_4
+%token WS
+IGNORE WS
+/* FINALIZA sección de TOKENS */
+%%
+/* INICIA sección de PRODUCCIONES */
+production1:
+ production1 TOKEN_2 production2
+ | production2
+;
+production2:
+ production2 TOKEN_2 production3
+ | production3
+;
+production3:
+ TOKEN_3 production1 TOKEN_4
+ | TOKEN_1
+;
