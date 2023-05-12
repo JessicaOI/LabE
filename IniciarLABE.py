@@ -1,7 +1,15 @@
 import re
 
-# Reemplaza las comillas en el contenido del archivo.
-def sustituir_comillas(file_content):
+def format_yalex_content(yalex_content):
+    file_content = yalex_content
+    header_result, file_content = build_header_and_trailer(file_content)
+    file_content = clean_comments(file_content)
+    file_content = replace_quotation_mark(file_content)
+    regex = build_regex(file_content)
+    tokens = build_tokens(file_content, regex)
+    return header_result, regex, tokens
+
+def replace_quotation_mark(file_content):
     file_content = file_content.replace("\'\"\'","(' ハ ')")
     file_content = file_content.replace("\"\'\"","(' ワ ')")
     file_content = file_content.replace("\'`\'","(' カ ')")
@@ -9,14 +17,12 @@ def sustituir_comillas(file_content):
     file_content = file_content.replace("'", " ' ")
     return file_content
 
-# Limpia los comentarios del contenido del archivo.
-def eliminar_comentarios(file_content):
+def clean_comments(file_content):
     patron = re.compile(r'\(\*.*?\*\)', re.DOTALL)
     file_content = re.sub(patron, '', file_content)
     return file_content
 
-# Construye la expresión regular a partir del contenido del archivo.
-def construir_regex(file_content,inicio):
+def build_regex(file_content,inicio):
     ErrorStack = []
     patron = re.compile(r'\{.*?\}', re.DOTALL)
     content = re.sub(patron, '', file_content)
@@ -46,7 +52,7 @@ def construir_regex(file_content,inicio):
         line = line.strip()
         if line:
             if re.match(simple_regex_pattern, line):
-                regex,ErrorStack = agregar_regex_comun(line, regex, simple_pattern, compound_pattern,ErrorStack)
+                regex,ErrorStack = add_common_regex(line, regex, simple_pattern, compound_pattern,ErrorStack)
             elif line.startswith("let"):
                 ErrorStack.append(f"Expresión regular inválida en la línea {line_num+inicio}: {line}")
             elif line.startswith("rule tokens"):
@@ -59,40 +65,25 @@ def construir_regex(file_content,inicio):
     fin = line_num+inicio
     return regex, ErrorStack,fin
 
-# Verifica si existe un trailer en el contenido del archivo.
-def revisar_trailer(content):
-    has_header = True
-    j = len(content) - 1
-    while has_header:
-        line = content[j].strip()
-        if line:
-            if 'return' in line or '|' in line:
-                return False
-            if line == "}" or "}" in line:
-                return True
-        j -= 1
 
-# Verifica si existe un encabezado en el contenido del archivo.
-def verificar_encabezado(content):
-    has_header = True
-    i = 0
-    while has_header:
-        line = content[i].strip()
-        if line:
-            if line == "{" or "{" in line:
-                return True
-        if 'let' in line or 'rule' in line:
-            return False
-        i += 1
+def build_tokens(file_content, regex,errorStack,inicio):
+    content = file_content.split('rule tokens =')
+    content = trim_quotation_marks(content[1])
+    content = content.strip().split('|')
+    content = replace_delimiters(content)
+    content,errorStack = convert_regexes_to_tuples(content,regex,errorStack,inicio)
+    content = add_meta_character_token(content)
+    content = replace_existing_regex(content, regex)
+    return content,errorStack
 
-# Construye el encabezado y el trailer a partir del contenido del archivo.
-def crear_encabezado_y_trailer(file_content):
+def build_header_and_trailer(file_content):
     content = file_content.split('\n')
     header_result = ''
     trailer_result = ''
     i = 0
 
-    if verificar_encabezado(content):
+    # Build header
+    if check_header(content):
         finished = False
         started = False
         while not finished:
@@ -114,7 +105,7 @@ def crear_encabezado_y_trailer(file_content):
 
     # Build trailer
     j = len(content) - 1
-    if revisar_trailer(content):
+    if check_trailer(content):
         finished = False
         while not finished and j >= 0:
             line = content[j]
@@ -147,8 +138,34 @@ def crear_encabezado_y_trailer(file_content):
     file_content = '\n'.join(content[:j+1])
     return header_result, trailer_result, file_content, i
 
-# Reemplaza los delimitadores en las expresiones.
-def reemplazar_delimitadores(expressions):
+def check_trailer(content):
+    has_header = True
+    j = len(content) - 1
+    while has_header:
+        line = content[j].strip()
+        if line:
+            if 'return' in line or '|' in line:
+                return False
+            if line == "}" or "}" in line:
+                return True
+        j -= 1
+
+
+def check_header(content):
+    has_header = True
+    i = 0
+    while has_header:
+        line = content[i].strip()
+        if line:
+            if line == "{" or "{" in line:
+                return True
+        if 'let' in line or 'rule' in line:
+            return False
+        i += 1
+
+# Funciones auxiliares para build_tokens
+
+def replace_delimiters(expressions):
     new_list = []
     for element in expressions:
         element = element.replace('\n', '')
@@ -156,8 +173,7 @@ def reemplazar_delimitadores(expressions):
         new_list.append(element)
     return new_list
 
-# Reemplaza las expresiones regulares existentes en la lista de expresiones.
-def cambiar_regex_existente(expressions, regex):
+def replace_existing_regex(expressions, regex):
     new_list = []
     for element in expressions:
         r = element[0]
@@ -167,8 +183,7 @@ def cambiar_regex_existente(expressions, regex):
         new_list.append(element)
     return new_list
 
-# Convierte las expresiones regulares en la lista de expresiones en tuplas.
-def cambiar_regex_a_tuplas(expressions,regex,errorStack,inicio):
+def convert_regexes_to_tuples(expressions,regex,errorStack,inicio):
     simple_pattern = r"\[(\w)\s*-\s*(\w)\]"
     compound_pattern = r"\[(\w)\s*-\s*(\w)\s*(\w)\s*-\s*(\w)\]"
     new_list = []
@@ -178,7 +193,7 @@ def cambiar_regex_a_tuplas(expressions,regex,errorStack,inicio):
         if len(splitted) >= 2:
             first_part = splitted[0]
             if first_part not in regex.keys():
-                first_part,errorStack = regex_habitual(first_part.split(" "),regex, simple_pattern, compound_pattern,errorStack,line_number)
+                first_part,errorStack = common_regex(first_part.split(" "),regex, simple_pattern, compound_pattern,errorStack,line_number)
             second_part = splitted[1].replace('\t', '')
             second_part = second_part.replace('{' , '')
             second_part = second_part.replace('}', '')
@@ -189,46 +204,51 @@ def cambiar_regex_a_tuplas(expressions,regex,errorStack,inicio):
             errorStack.append(f"Error en la línea {line_number}: expresión no válida faltan parámetros")
     return new_list,errorStack
 
-# Agrega el token de carácter especial a las expresiones.
-def agregar_token_de_caracteres_especiales(expressions):
+
+def add_meta_character_token(expressions):
     new_list = []
     for element in expressions:
         expression = element[0]
         if "'" in expression or '"' in expression:
-            element[0] = agregar_caracteres_string(expression)
+            element[0] = add_meta_character_string(expression)
         if "\\" in expression:
             element[0] = element[0].replace("\\", "")
         new_list.append(element)
     return new_list
 
-# Recorta las comillas en una línea de texto.
-def quitar_comillas(line):
+def trim_quotation_marks(line):
     matches = re.findall(r"'([^']+)'", line)
     for element in matches:
         text = element
         line = line.replace("'" + text + "'", "'" + text.strip() + "'")
     return line
 
-# Construye los tokens a partir del contenido del archivo y la expresión regular.
-def generar_tokens(file_content, regex,errorStack,inicio):
-    content = file_content.split('rule tokens =')
-    content = quitar_comillas(content[1])
-    content = content.strip().split('|')
-    content = reemplazar_delimitadores(content)
-    content,errorStack = cambiar_regex_a_tuplas(content,regex,errorStack,inicio)
-    content = agregar_token_de_caracteres_especiales(content)
-    content = cambiar_regex_existente(content, regex)
-    return content,errorStack
+# Funciones auxiliares para add_common_regex
 
-
-def operadores_logicos(line):
+def space_operators(line):
     operators = '*+|?()'
     for operator in operators:
         line = line.replace(operator, ' ' + operator + ' ')
     return line
 
+def replace_common_patterns(regex, simple_pattern, compound_pattern):
+    search_spaces = re.search(r"\[(\\s|\\t|\\n|,|\s)+\]", regex)
+    search_simple_regex_result = re.search(simple_pattern, regex)
+    search_compound_regex_result = re.search(compound_pattern, regex)
+    
+    letters = 'abcdefghijklmnopqrstuvwxyz'
+    upper_letters = letters.upper()
+    numbers = '0123456789'
 
-def intervalo_de_multiples_espacios(regex, search_spaces):
+    if search_simple_regex_result and not search_compound_regex_result:
+        regex = simple_range(regex, search_simple_regex_result, letters, numbers,upper_letters)
+    elif search_compound_regex_result:
+        regex = compound_range(regex, search_compound_regex_result, letters, numbers,upper_letters)
+    elif search_spaces:
+        regex = multiple_space_range(regex, search_spaces)
+    return regex
+
+def multiple_space_range(regex, search_spaces):
     space_map = {
         '\\s': r'\サ',
         '\\t': r'\ラ',
@@ -241,43 +261,23 @@ def intervalo_de_multiples_espacios(regex, search_spaces):
     #regex = regex.replace(search_spaces.group(0), f'({space_regex})')
     return regex
 
-# Reemplaza los patrones comunes en una expresión regular.
-def reemplazar_patrones_comunes(regex, simple_pattern, compound_pattern):
-    search_spaces = re.search(r"\[(\\s|\\t|\\n|,|\s)+\]", regex)
-    search_simple_regex_result = re.search(simple_pattern, regex)
-    search_compound_regex_result = re.search(compound_pattern, regex)
-    
-    letters = 'abcdefghijklmnopqrstuvwxyz'
-    upper_letters = letters.upper()
-    numbers = '0123456789'
-
-    if search_simple_regex_result and not search_compound_regex_result:
-        regex = rango_simple(regex, search_simple_regex_result, letters, numbers,upper_letters)
-    elif search_compound_regex_result:
-        regex = rango_compuesto(regex, search_compound_regex_result, letters, numbers,upper_letters)
-    elif search_spaces:
-        regex = intervalo_de_multiples_espacios(regex, search_spaces)
-    return regex
-
-# Reemplaza el rango simple en una expresión regular.
-def rango_simple(regex, search_simple_regex_result, letters, numbers,upper_letters):
+def simple_range(regex, search_simple_regex_result, letters, numbers,upper_letters):
     initial = search_simple_regex_result.group(1)
     final = search_simple_regex_result.group(2)
-    result = remplazar_rango(initial, final, letters, numbers,upper_letters)
+    result = replace_range(initial, final, letters, numbers,upper_letters)
     result = '(' + result + ')'
     regex = regex.replace('['+initial+'-'+final+']', result)
     return regex
 
-# Reemplaza el rango compuesto en una expresión regular.
-def rango_compuesto(regex, search_compound_regex_result, letters, numbers,upper_letters):
+def compound_range(regex, search_compound_regex_result, letters, numbers,upper_letters):
     first_initial = search_compound_regex_result.group(1)
     first_final = search_compound_regex_result.group(2)
 
     last_initial = search_compound_regex_result.group(3)
     last_final = search_compound_regex_result.group(4)
 
-    first_range = remplazar_rango(first_initial, first_final, letters, numbers,upper_letters)
-    second_range = remplazar_rango(last_initial, last_final, letters, numbers,upper_letters)
+    first_range = replace_range(first_initial, first_final, letters, numbers,upper_letters)
+    second_range = replace_range(last_initial, last_final, letters, numbers,upper_letters)
 
     result = '(' + first_range + '|' + second_range + ')'
     replaced = ''
@@ -291,31 +291,29 @@ def rango_compuesto(regex, search_compound_regex_result, letters, numbers,upper_
     regex = regex.replace(replaced, result)
     return regex
 
-# Reemplaza el rango de caracteres en una expresión regular.
-def remplazar_rango(initial, final, letters, numbers,upper_letters):
+def replace_range(initial, final, letters, numbers,upper_letters):
     result = str(initial) + '|'
     if initial.lower() in numbers and final.lower() in letters:
-        result += quitar_numeros(initial, '9') + '|'
+        result += get_range_of_numbers(initial, '9') + '|'
         initial_letter = 'A' if final in upper_letters else 'a'
         result += initial_letter + '|'
-        result += quitar_strings(initial_letter, final, letters)
+        result += get_range_of_strings(initial_letter, final, letters)
     elif initial.lower() in letters:
         final_letter = 'Z' if initial in upper_letters else 'z'
         if final in numbers:
-            result += quitar_strings(initial, final_letter, letters) + '|'
-            result += '0' + '|' + quitar_numeros('0', final)
+            result += get_range_of_strings(initial, final_letter, letters) + '|'
+            result += '0' + '|' + get_range_of_numbers('0', final)
         else:
-            result += quitar_strings(initial, final, letters)
+            result += get_range_of_strings(initial, final, letters)
     elif initial in numbers:
-            result += quitar_numeros(initial, final)
+            result += get_range_of_numbers(initial, final)
     return result
 
-# Reemplaza el rango de letras en una expresión regular.
-def quitar_strings(initial, final, letters):
+def get_range_of_strings(initial, final, letters):
     result = ''
     if ord(initial) > ord(final) and final.lower() in letters:
-        result += quitar_strings(initial, 'z', letters) + '|'
-        result += quitar_strings(chr(ord(initial.upper()) -1), final, letters)
+        result += get_range_of_strings(initial, 'z', letters) + '|'
+        result += get_range_of_strings(chr(ord(initial.upper()) -1), final, letters)
     else:
         for i in range(ord(initial) + 1, ord(final)):
             between_letter = chr(i)
@@ -323,35 +321,32 @@ def quitar_strings(initial, final, letters):
         result += final
     return result
 
-# Reemplaza el rango de números en una expresión regular.
-def quitar_numeros(initial, final):
+def get_range_of_numbers(initial, final):
     result = ''
     for i in range(int(initial) + 1, int(final)):
         result += str(i) + '|'
     result += final
     return result
 
-# Genera una expresión regular común a partir de una línea de código.
-def regex_habitual(line, regex, simple_pattern, compound_pattern, errorStack,line_number=0):
-    body,erroStack = construir_regex_habitual(line, regex,errorStack,line_number)
+
+def common_regex(line, regex, simple_pattern, compound_pattern, errorStack,line_number=0):
+    body,erroStack = build_common_regex(line, regex,errorStack,line_number)
     body = body.replace('ε', ' ')
-    body = reemplazar_patrones_comunes(body, simple_pattern, compound_pattern)
+    body = replace_common_patterns(body, simple_pattern, compound_pattern)
     body = body.strip()
     return body,erroStack
 
-# Agrega la expresión regular comun
-def agregar_regex_comun(line, regex, simple_pattern, compound_pattern,errorStack):
-    line = operadores_logicos(line)
-    line = quitar_comillas(line)
+def add_common_regex(line, regex, simple_pattern, compound_pattern,errorStack):
+    line = space_operators(line)
+    line = trim_quotation_marks(line)
     line = line.replace('" "', '"ε"')
     line = line.replace("' '", "'ε'")
     line = line.split(" ")
-    body,errorStack = regex_habitual(line[3:], regex, simple_pattern, compound_pattern,errorStack)
+    body,errorStack = common_regex(line[3:], regex, simple_pattern, compound_pattern,errorStack)
     regex[line[1]] = body
     return regex,errorStack
 
-# Construye la expresión regular común a partir de una línea de código.
-def construir_regex_habitual(line, regex, errorStack, line_number=0):
+def build_common_regex(line, regex, errorStack, line_number=0):
     body = ''
     i = 0
     while i < len(line):
@@ -368,7 +363,7 @@ def construir_regex_habitual(line, regex, errorStack, line_number=0):
                 element = element.replace('(', '\(')
                 element = element.replace(')', '\)')
                 body += element
-        elif not verificar_operadores(element) and len(element) > 1:
+        elif not check_operators(element) and len(element) > 1:
             if element in regex:
                 replacement = regex[element]
                 body += replacement
@@ -379,16 +374,14 @@ def construir_regex_habitual(line, regex, errorStack, line_number=0):
         i += 1
     return body, errorStack
 
-# Verifica si un elemento contiene operadores.
-def verificar_operadores(element):
+def check_operators(element):
     operators = '*+|?'
     for operator in operators:
         if operator in element:
             return True
     return False
 
-# Agrega caracteres de escape a una expresión regular que representa una cadena de texto.
-def agregar_caracteres_string(expression):
+def add_meta_character_string(expression):
     expression = expression.replace('.', '\.')
     expression = expression.replace('+', '\+')
     expression = expression.replace('*', '\*')
@@ -396,16 +389,5 @@ def agregar_caracteres_string(expression):
     expression = expression.replace("'", "")
     return expression
 
-# Evalúa un token y devuelve el resultado.
-def evaluando_Token(token):
+def evalToken(token):
     return eval(token[1])
-
-#Formatea el contenido de Yalex.
-def ajustar_contenido_yalex(yalex_content):
-    file_content = yalex_content
-    header_result, file_content = crear_encabezado_y_trailer(file_content)
-    file_content = eliminar_comentarios(file_content)
-    file_content = sustituir_comillas(file_content)
-    regex = construir_regex(file_content)
-    tokens = generar_tokens(file_content, regex)
-    return header_result, regex, tokens
