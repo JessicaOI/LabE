@@ -118,7 +118,7 @@ def split_sections(content):
     productions_section = None
     sections = content.split('%%')
     if len(sections)!= 2:
-        errorStack.append("Error: No se encuentra la división '%%' entre las secciones de tokens y producciones.")
+        errorStack.append("Error: Los siguientes simbolos: '%%' no se encuentran en el archivo")
     else:
         tokens_section = sections[0]
         productions_section = sections[1]
