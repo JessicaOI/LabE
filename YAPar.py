@@ -179,13 +179,13 @@ def validate_yalp(tokens_section, productions_section, tokens, productions):
 
     # Verificar si existe la división '%%'
     if not tokens_section or not productions_section:
-        error_stack.append("Error: No se encuentra la división '%%' entre las secciones de tokens y producciones.")
+        error_stack.append("Error: Los siguientes simbolos: '%%' no se encuentran en el archivo")
 
     # Verificar si tiene el símbolo '%' antes de la declaración de tokens
     lines = tokens_section.split('\n')
     for line in lines:
         if not line.startswith("%token") and not line.startswith("IGNORE") and line.strip():
-            error_stack.append(f"Error: No se encuentra el símbolo '%' antes de la declaración de tokens en la línea '{line.strip()}'.")
+            error_stack.append(f"Error: El siguiente simbolo: '%' no esta antes de la declaracion del token en la siguiente linea: '{line.strip()}'.")
             break
 
     # Verificar si hay reglas de producción vacías:
