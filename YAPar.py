@@ -2,6 +2,39 @@ import re
 from graphviz import Digraph
 
 
+# Genera un gráfico del autómata LR(0) utilizando la biblioteca Graphviz.
+def generate_lr0_diagram(states, transitions):
+    dot = Digraph("LR0", format='png')
+    dot.attr(rankdir="LR")
+    dot.attr('node', shape='rectangle')
+
+    accept_state = len(states) - 1
+
+    for i, state in enumerate(states):
+        if i == accept_state:  # Estado de aceptación
+            label = 'ACEPTAR'
+        else:
+            non_derived = [str(item) for item in state if not item.derived]
+            derived = [str(item) for item in state if item.derived]
+
+            label = f'Estado {i}\n'
+            label += 'No derivadas:\n'
+            label += '\n'.join(non_derived) + '\n'
+            label += 'Derivadas:\n'
+            label += '\n'.join(derived)
+
+
+
+        dot.node(str(i), label=label)
+
+    for t in transitions:
+        dot.edge(str(t[0]), str(t[2]), label=t[1])
+
+    # Generar y guardar el gráfico como imagen PNG
+    dot.render("DiagramaLR0", cleanup=True)
+    print("Diagrama LR0 generado")
+
+
 # Obtiene los conjuntos de terminales y no terminales a partir de las producciones.
 def get_terminals_and_non_terminals(productions):
     non_terminals = set(productions.keys())
@@ -155,11 +188,11 @@ def validate_yalp(tokens_section, productions_section, tokens, productions):
             error_stack.append(f"Error: No se encuentra el símbolo '%' antes de la declaración de tokens en la línea '{line.strip()}'.")
             break
 
-    # Verificar si una producción tiene el mismo nombre que un token
-    for token in tokens:
-        if token in productions:
-            error_stack.append(f"Error: La producción '{token}' tiene el mismo nombre que un token.")
-            break
+    # Verificar si hay reglas de producción vacías:
+    empty_productions = [non_terminal for non_terminal, rules in productions.items() if not rules or all(not rule.strip() for rule in rules)]
+    if empty_productions:
+        error_stack.append(f"Error: Las siguientes producciones tienen reglas vacías: {', '.join(empty_productions)}")
+
 
     return error_stack
 
